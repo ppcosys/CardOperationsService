@@ -1,4 +1,6 @@
 
+using CardOperationsService.Application.Cards.Queries;
+
 namespace CardOperationsService.Api;
 
 public class Program
@@ -9,6 +11,10 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
+
+        builder.Services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssemblyContaining<GetAllowedCardActionsQuery>());
+
         builder.Services.AddAuthorization();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

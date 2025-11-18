@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CardOperationsService.Domain\CardOperationsService.Domain.csproj" />
     <ProjectReference Include="..\CardOperationsService.Contracts\CardOperationsService.Contracts.csproj" />
   </ItemGroup>
