@@ -9,5 +9,5 @@ using System.Threading.Tasks;
 
 namespace CardOperationsService.Application.Cards.Queries
 {
-    public record GetAllowedCardActionsQuery(CardDetails Card) : IRequest<List<CardAction>>;
+    public record GetAllowedCardActionsQuery(CardDetails Card) : IRequest<List<string>>;
 }

@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 
 namespace CardOperationsService.Application.Cards.Queries
 {
-    public class GetAllowedCardActionsQueryHandler : IRequestHandler<GetAllowedCardActionsQuery, List<CardAction>>
+    public class GetAllowedCardActionsQueryHandler : IRequestHandler<GetAllowedCardActionsQuery, List<string>>
     {
-        public Task<List<CardAction>> Handle(GetAllowedCardActionsQuery request, CancellationToken cancellationToken)
+        public Task<List<string>> Handle(GetAllowedCardActionsQuery request, CancellationToken cancellationToken)
         {
-            var allowedActions = CardRules.GetAllowedActions(request.Card);
+            var allowedActions = CardRules.GetAllowedActions(request.Card)
+                .Select(action => action.ToString())
+                .ToList();
+
             return Task.FromResult(allowedActions);
         }
     }
