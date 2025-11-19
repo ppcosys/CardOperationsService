@@ -1,0 +1,32 @@
+﻿using CardOperationsService.Application.Cards.Queries.GetCardDetails;
+using CardOperationsService.Contracts.CardDetails;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+
+
+namespace CardOperationsService.Api.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class CardDetailsController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+
+        public CardDetailsController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        [HttpGet("{userId}/{cardNumber}")]
+        public async Task<ActionResult<CardDetailsResponse>> GetCardDetails(string userId, string cardNumber)
+        {
+            var result = await _mediator.Send(new GetCardDetailsQuery(userId, cardNumber));
+
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+    }
+}

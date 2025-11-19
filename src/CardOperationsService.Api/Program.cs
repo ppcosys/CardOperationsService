@@ -1,5 +1,7 @@
 
 using CardOperationsService.Application.Cards.Queries;
+using CardOperationsService.Domain.Abstractions;
+using CardOperationsService.Infrastructure.Services;
 
 namespace CardOperationsService.Api;
 
@@ -11,6 +13,8 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
+
+        builder.Services.AddSingleton<ICardService, InMemoryCardService>();
 
         builder.Services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblyContaining<GetAllowedCardActionsQuery>());
