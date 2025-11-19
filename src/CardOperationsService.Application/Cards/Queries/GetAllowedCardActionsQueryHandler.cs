@@ -14,7 +14,7 @@ namespace CardOperationsService.Application.Cards.Queries
         public Task<List<string>> Handle(GetAllowedCardActionsQuery request, CancellationToken cancellationToken)
         {
             var allowedActions = CardRules.GetAllowedActions(request.Card)
-                .Select(action => action.ToString())
+                .Select(action => action.ToString().ToUpper())
                 .ToList();
 
             return Task.FromResult(allowedActions);
