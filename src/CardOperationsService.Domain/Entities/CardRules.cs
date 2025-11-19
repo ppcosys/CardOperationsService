@@ -13,90 +13,75 @@ namespace CardOperationsService.Domain.Entities
         {
             var actions = new List<CardAction>();
 
-            // ACTION1
-            if (IsYes(card, CardAction.Action1))
-                actions.Add(CardAction.Action1);
-
-            // ACTION2
-            if (IsYes(card, CardAction.Action2))
-                actions.Add(CardAction.Action2);
-
-            // ACTION3
-            if (IsYes(card, CardAction.Action3))
-                actions.Add(CardAction.Action3);
-
-            // ACTION4
-            if (IsYes(card, CardAction.Action4))
-                actions.Add(CardAction.Action4);
-
-            // ACTION5
-            if (IsYes(card, CardAction.Action5))
-                actions.Add(CardAction.Action5);
-
-            // ACTION6
-            if (IsYes(card, CardAction.Action6))
-                actions.Add(CardAction.Action6);
-
-            // ACTION7
-            if (IsYes(card, CardAction.Action7))
-                actions.Add(CardAction.Action7);
-
-            // ACTION8
-            if (IsYes(card, CardAction.Action8))
-                actions.Add(CardAction.Action8);
-
-            // ACTION9
-            if (IsYes(card, CardAction.Action9))
-                actions.Add(CardAction.Action9);
-
-            // ACTION10
-            if (IsYes(card, CardAction.Action10))
-                actions.Add(CardAction.Action10);
-
-            // ACTION11
-            if (IsYes(card, CardAction.Action11))
-                actions.Add(CardAction.Action11);
-
-            // ACTION12
-            if (IsYes(card, CardAction.Action12))
-                actions.Add(CardAction.Action12);
-
-            // ACTION13
-            if (IsYes(card, CardAction.Action13))
-                actions.Add(CardAction.Action13);
+            foreach (CardAction action in Enum.GetValues(typeof(CardAction)))
+            {
+                if (IsActionAllowed(card, action))
+                    actions.Add(action);
+            }
 
             return actions;
         }
 
-        private static bool IsYes(CardDetails card, CardAction action)
+        private static bool IsActionAllowed(CardDetails card, CardAction action)
         {
-            var t = card.CardType;
-            var s = card.CardStatus;
-            var pin = card.IsPinSet;
-
             return action switch
             {
-                CardAction.Action1 => IsAllowed(t) && IsStatus(s, CardStatus.Active),
-                CardAction.Action2 => IsAllowed(t) && IsStatus(s, CardStatus.Active) && t != CardType.Prepaid,
-                CardAction.Action3 => IsAllowed(t) && IsStatus(s),
-                CardAction.Action4 => IsAllowed(t) && IsStatus(s),
-                CardAction.Action5 => t == CardType.Credit && IsStatus(s),
-                CardAction.Action6 => IsAllowed(t) && IsStatus(s, CardStatus.Active, CardStatus.Inactive, CardStatus.Ordered, CardStatus.Blocked) && pin,
-                CardAction.Action7 => IsAllowed(t) && IsStatus(s, CardStatus.Active, CardStatus.Inactive, CardStatus.Ordered, CardStatus.Blocked) && pin,
-                CardAction.Action8 => IsAllowed(t) && IsStatus(s),
-                CardAction.Action9 => IsAllowed(t) && IsStatus(s),
-                CardAction.Action10 => false,
-                CardAction.Action11 => false,
-                CardAction.Action12 => IsAllowed(t) && IsStatus(s, CardStatus.Active, CardStatus.Inactive, CardStatus.Ordered),
-                CardAction.Action13 => IsAllowed(t) && IsStatus(s, CardStatus.Active, CardStatus.Inactive, CardStatus.Ordered),
+                // ACTION1:
+                CardAction.Action1 => card.CardStatus == CardStatus.Active,
+
+                // ACTION2:
+                CardAction.Action2 => card.CardStatus == CardStatus.Inactive,
+
+                // ACTION3:
+                CardAction.Action3 => true,
+
+                // ACTION4:
+                CardAction.Action4 => true,
+
+                // ACTION5:
+                CardAction.Action5 => card.CardType == CardType.Credit,
+
+                // ACTION6:
+                CardAction.Action6 => (card.CardStatus == CardStatus.Ordered ||
+                                      card.CardStatus == CardStatus.Inactive ||
+                                      card.CardStatus == CardStatus.Active ||
+                                      card.CardStatus == CardStatus.Blocked) && card.IsPinSet,
+
+                // ACTION7:
+                CardAction.Action7 => ((card.CardStatus == CardStatus.Ordered ||
+                                       card.CardStatus == CardStatus.Inactive ||
+                                       card.CardStatus == CardStatus.Active) && !card.IsPinSet) ||
+                                      (card.CardStatus == CardStatus.Blocked && card.IsPinSet),
+
+                // ACTION8:
+                CardAction.Action8 => card.CardStatus == CardStatus.Ordered ||
+                                     card.CardStatus == CardStatus.Inactive ||
+                                     card.CardStatus == CardStatus.Active ||
+                                     card.CardStatus == CardStatus.Blocked,
+
+                // ACTION9:
+                CardAction.Action9 => true,
+
+                // ACTION10:
+                CardAction.Action10 => card.CardStatus == CardStatus.Ordered ||
+                                      card.CardStatus == CardStatus.Inactive ||
+                                      card.CardStatus == CardStatus.Active,
+
+                // ACTION11:
+                CardAction.Action11 => card.CardStatus == CardStatus.Inactive ||
+                                      card.CardStatus == CardStatus.Active,
+
+                // ACTION12:
+                CardAction.Action12 => card.CardStatus == CardStatus.Ordered ||
+                                      card.CardStatus == CardStatus.Inactive ||
+                                      card.CardStatus == CardStatus.Active,
+
+                // ACTION13:
+                CardAction.Action13 => card.CardStatus == CardStatus.Ordered ||
+                                      card.CardStatus == CardStatus.Inactive ||
+                                      card.CardStatus == CardStatus.Active,
                 _ => false
             };
         }
-
-        private static bool IsAllowed(CardType t)
-            => t == CardType.Prepaid || t == CardType.Debit || t == CardType.Credit;
-
-        private static bool IsStatus(CardStatus s, params CardStatus[] statuses)
-            => statuses.Length == 0 || statuses.Contains(s);
     }
 }
