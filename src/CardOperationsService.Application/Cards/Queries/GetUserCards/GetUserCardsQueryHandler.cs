@@ -7,6 +7,7 @@ using CardOperationsService.Application.Cards.Queries.GetUserCards;
 using CardOperationsService.Domain.Abstractions;
 using CardOperationsService.Contracts.CardDetails;
 using MediatR;
+using CardOperationsService.Domain.Enums;
 
 namespace CardOperationsService.Application.Cards.Queries.GetUserCards
 {
@@ -21,7 +22,14 @@ namespace CardOperationsService.Application.Cards.Queries.GetUserCards
 
         public async Task<UserCardsResponse> Handle(GetUserCardsQuery request, CancellationToken cancellationToken)
         {
-            var cards = await _cardService.GetUserCards(request.UserId);
+            var (cards, totalCount) = await _cardService.GetUserCardsWithFilters(
+                request.UserId,
+                request.CardType,
+                request.CardStatus,
+                request.IsPinSet,
+                request.Page,
+                request.PageSize
+            );
 
             var cardResponses = cards.Select(card => new CardDetailsResponse(
                 CardNumber: card.CardNumber,
@@ -30,7 +38,19 @@ namespace CardOperationsService.Application.Cards.Queries.GetUserCards
                 IsPinSet: card.IsPinSet
             ));
 
-            return new UserCardsResponse(request.UserId, cardResponses);
+            var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+            return new UserCardsResponse(
+                UserId: request.UserId,
+                Cards: cardResponses,
+                TotalCount: totalCount,
+                Page: request.Page,
+                PageSize: request.PageSize,
+                TotalPages: totalPages,
+                CardTypeFilter: request.CardType,
+                CardStatusFilter: request.CardStatus,
+                IsPinSetFilter: request.IsPinSet
+            );
         }
     }
 }

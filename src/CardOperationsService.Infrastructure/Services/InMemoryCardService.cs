@@ -28,7 +28,7 @@ namespace CardOperationsService.Infrastructure.Services
 
         public async Task<IEnumerable<CardDetails>> GetUserCards(string userId)
         {
-            await Task.Delay(50); // Krótsze opóźnienie dla wielu kart
+            await Task.Delay(50);
 
             if (_userCards.TryGetValue(userId, out var cards))
             {
@@ -36,6 +36,50 @@ namespace CardOperationsService.Infrastructure.Services
             }
 
             return Enumerable.Empty<CardDetails>();
+        }
+
+        public async Task<(IEnumerable<CardDetails> Cards, int TotalCount)> GetUserCardsWithFilters(
+            string userId,
+            CardType? cardType = null,
+            CardStatus? cardStatus = null,
+            bool? isPinSet = null,
+            int page = 1,
+            int pageSize = 10)
+        {
+            await Task.Delay(50);
+
+            if (!_userCards.TryGetValue(userId, out var cardsDict))
+            {
+                return (Enumerable.Empty<CardDetails>(), 0);
+            }
+
+            var cards = cardsDict.Values.AsEnumerable();
+
+            
+            if (cardType.HasValue)
+            {
+                cards = cards.Where(c => c.CardType == cardType.Value);
+            }
+
+            if (cardStatus.HasValue)
+            {
+                cards = cards.Where(c => c.CardStatus == cardStatus.Value);
+            }
+
+            if (isPinSet.HasValue)
+            {
+                cards = cards.Where(c => c.IsPinSet == isPinSet.Value);
+            }
+
+            var totalCount = cards.Count();
+
+            
+            var pagedCards = cards
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return (pagedCards, totalCount);
         }
 
         private static Dictionary<string, Dictionary<string, CardDetails>> CreateSampleUserCards()

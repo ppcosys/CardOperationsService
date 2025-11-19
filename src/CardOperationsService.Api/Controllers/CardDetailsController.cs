@@ -1,6 +1,7 @@
 ﻿using CardOperationsService.Application.Cards.Queries.GetCardDetails;
 using CardOperationsService.Application.Cards.Queries.GetUserCards;
 using CardOperationsService.Contracts.CardDetails;
+using CardOperationsService.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,13 +32,26 @@ namespace CardOperationsService.Api.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<UserCardsResponse>> GetUserCards(string userId)
+        public async Task<ActionResult<UserCardsResponse>> GetUserCards(
+            string userId,
+            [FromQuery] CardType? cardType = null,
+            [FromQuery] CardStatus? cardStatus = null,
+            [FromQuery] bool? isPinSet = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var result = await _mediator.Send(new GetUserCardsQuery(userId));
+            var result = await _mediator.Send(new GetUserCardsQuery(
+                userId,
+                cardType,
+                cardStatus,
+                isPinSet,
+                page,
+                pageSize
+            ));
 
             if (result == null || !result.Cards.Any())
             {
-                return NotFound($"No cards found for user {userId}");
+                return NotFound($"No cards found for user {userId} with specified filters");
             }
 
             return Ok(result);
