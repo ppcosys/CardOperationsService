@@ -19,9 +19,26 @@ namespace CardOperationsService.Api.Controllers
         [HttpPost("allowed")]
         public async Task<IActionResult> GetAllowedActions([FromBody] CardDetails card)
         {
-            var query = new GetAllowedCardActionsQuery(card);
-            var result = await _mediator.Send(query);
-            return Ok(result);
+            if (card == null)
+            {
+                return BadRequest("Card details are required");
+            }
+
+            if (string.IsNullOrWhiteSpace(card.CardNumber))
+            {
+                return BadRequest("Card number is required");
+            }
+
+            try
+            {
+                var query = new GetAllowedCardActionsQuery(card);
+                var result = await _mediator.Send(query);
+                return Ok(new { allowedActions = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }
