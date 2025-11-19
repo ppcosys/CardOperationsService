@@ -26,6 +26,18 @@ namespace CardOperationsService.Infrastructure.Services
             return card;
         }
 
+        public async Task<IEnumerable<CardDetails>> GetUserCards(string userId)
+        {
+            await Task.Delay(50); // Krótsze opóźnienie dla wielu kart
+
+            if (_userCards.TryGetValue(userId, out var cards))
+            {
+                return cards.Values;
+            }
+
+            return Enumerable.Empty<CardDetails>();
+        }
+
         private static Dictionary<string, Dictionary<string, CardDetails>> CreateSampleUserCards()
         {
             var userCards = new Dictionary<string, Dictionary<string, CardDetails>>();

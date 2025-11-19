@@ -10,5 +10,6 @@ namespace CardOperationsService.Domain.Abstractions
     public interface ICardService
     {
         Task<CardDetails?> GetCardDetails(string userId, string cardNumber);
+        Task<IEnumerable<CardDetails>> GetUserCards(string userId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CardOperationsService.Application.Cards.Queries.GetCardDetails;
+using CardOperationsService.Application.Cards.Queries.GetUserCards;
 using CardOperationsService.Contracts.CardDetails;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,19 @@ namespace CardOperationsService.Api.Controllers
 
             if (result == null)
                 return NotFound();
+
+            return Ok(result);
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<UserCardsResponse>> GetUserCards(string userId)
+        {
+            var result = await _mediator.Send(new GetUserCardsQuery(userId));
+
+            if (result == null || !result.Cards.Any())
+            {
+                return NotFound($"No cards found for user {userId}");
+            }
 
             return Ok(result);
         }
