@@ -1,9 +1,4 @@
 ﻿using CardOperationsService.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CardOperationsService.Domain.Entities
 {
@@ -24,6 +19,9 @@ namespace CardOperationsService.Domain.Entities
 
         private static bool IsActionAllowed(CardDetails card, CardAction action)
         {
+            if (!IsValidCardType(card.CardType) || !IsValidCardStatus(card.CardStatus))
+                return false;
+
             return action switch
             {
                 // ACTION1:
@@ -80,8 +78,27 @@ namespace CardOperationsService.Domain.Entities
                 CardAction.Action13 => card.CardStatus == CardStatus.Ordered ||
                                       card.CardStatus == CardStatus.Inactive ||
                                       card.CardStatus == CardStatus.Active,
+
                 _ => false
             };
+        }
+
+        private static bool IsValidCardType(CardType cardType)
+        {
+            return cardType == CardType.Prepaid ||
+                   cardType == CardType.Debit ||
+                   cardType == CardType.Credit;
+        }
+
+        private static bool IsValidCardStatus(CardStatus cardStatus)
+        {
+            return cardStatus == CardStatus.Ordered ||
+                   cardStatus == CardStatus.Inactive ||
+                   cardStatus == CardStatus.Active ||
+                   cardStatus == CardStatus.Restricted ||
+                   cardStatus == CardStatus.Blocked ||
+                   cardStatus == CardStatus.Expired ||
+                   cardStatus == CardStatus.Closed;
         }
     }
 }
