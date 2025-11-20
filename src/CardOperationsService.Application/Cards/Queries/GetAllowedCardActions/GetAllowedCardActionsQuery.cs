@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardOperationsService.Application.Cards.Queries
+namespace CardOperationsService.Application.Cards.Queries.GetAllowedCardActions
 {
     public record GetAllowedCardActionsQuery(CardDetails Card) : IRequest<List<string>>;
 }

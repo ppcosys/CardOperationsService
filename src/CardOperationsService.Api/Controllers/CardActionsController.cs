@@ -1,4 +1,5 @@
-﻿using CardOperationsService.Application.Cards.Queries;
+﻿using CardOperationsService.Application.Cards.Queries.GetAllowedCardActions;
+
 using CardOperationsService.Domain.Entities;
 using CardOperationsService.Domain.Enums;
 using MediatR;

@@ -1,4 +1,4 @@
-﻿using CardOperationsService.Application.Cards.Queries;
+﻿using CardOperationsService.Application.Cards.Queries.GetAllowedCardActions;
 using CardOperationsService.Domain.Abstractions;
 using CardOperationsService.Infrastructure.Services;
 
