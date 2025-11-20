@@ -22,7 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\CardOperationsService.Api\CardOperationsService.Api.csproj" />
+    <ProjectReference Include="..\..\src\CardOperationsService.Application\CardOperationsService.Application.csproj" />
     <ProjectReference Include="..\..\src\CardOperationsService.Domain\CardOperationsService.Domain.csproj" />
+    <ProjectReference Include="..\..\src\CardOperationsService.Infrastructure\CardOperationsService.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\CardOperationsService.Contracts\CardOperationsService.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
