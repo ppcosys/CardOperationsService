@@ -25,7 +25,7 @@ CardOperationsService to mikroserwis służący do pobierania i analizowania inf
 
 1. Otwórz projekt w Visual Studio 2022.
 2. Uruchom projekt `CardOperationsService.Api` jako projekt startowy.
-3. Wejdź w przeglądarce na adres `http://localhost:5000/swagger` lub za pośrednictwem aplikacji Postaman.
+3. Wejdź w przeglądarce na adres `http://localhost:5000/swagger` lub za pośrednictwem aplikacji Postman.
 
 ---
 
