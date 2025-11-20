@@ -157,7 +157,7 @@ namespace CardOperationsService.Tests
             var result = await _service.GetUserCards("User1");
 
             // Assert
-            result.Should().HaveCount(21); // 3 typy × 7 statusów
+            result.Should().HaveCount(21); // 3 types × 7 statuses
         }
     }
 }

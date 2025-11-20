@@ -4,7 +4,7 @@ using CardOperationsService.Contracts.CardDetails;
 using CardOperationsService.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 
 
 namespace CardOperationsService.Api.Controllers
@@ -14,21 +14,33 @@ namespace CardOperationsService.Api.Controllers
     public class CardDetailsController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<CardDetailsController> _logger;
 
-        public CardDetailsController(IMediator mediator)
+        public CardDetailsController(IMediator mediator, ILogger<CardDetailsController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpGet("{userId}/{cardNumber}")]
         public async Task<ActionResult<CardDetailsResponse>> GetCardDetails(string userId, string cardNumber)
         {
-            var result = await _mediator.Send(new GetCardDetailsQuery(userId, cardNumber));
+            if (string.IsNullOrWhiteSpace(userId) || userId.Length > 50)
+                return BadRequest("User ID is required and must be less than 50 characters");
 
-            if (result == null)
-                return NotFound();
+            if (string.IsNullOrWhiteSpace(cardNumber) || cardNumber.Length > 20)
+                return BadRequest("Card number is required and must be less than 20 characters");
 
-            return Ok(result);
+            try
+            {
+                var result = await _mediator.Send(new GetCardDetailsQuery(userId, cardNumber));
+                return result == null ? NotFound($"Card {cardNumber} not found for user {userId}") : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving card details for user {UserId}, card {CardNumber}", userId, cardNumber);
+                return StatusCode(500, "An error occurred while processing your request");
+            }
         }
 
         [HttpGet("{userId}")]
@@ -40,21 +52,32 @@ namespace CardOperationsService.Api.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
-            var result = await _mediator.Send(new GetUserCardsQuery(
-                userId,
-                cardType,
-                cardStatus,
-                isPinSet,
-                page,
-                pageSize
-            ));
+            if (page < 1) return BadRequest("Page must be greater than 0");
+            if (pageSize < 1 || pageSize > 100) return BadRequest("Page size must be between 1 and 100");
+            if (string.IsNullOrWhiteSpace(userId)) return BadRequest("User ID is required");
 
-            if (result == null || !result.Cards.Any())
+            try
             {
-                return NotFound($"No cards found for user {userId} with specified filters");
-            }
+                var result = await _mediator.Send(new GetUserCardsQuery(userId, cardType, cardStatus, isPinSet, page, pageSize));
 
-            return Ok(result);
+                if (!result.Cards.Any())
+                {
+                    var filters = new List<string>();
+                    if (cardType.HasValue) filters.Add($"type: {cardType}");
+                    if (cardStatus.HasValue) filters.Add($"status: {cardStatus}");
+                    if (isPinSet.HasValue) filters.Add($"PIN: {isPinSet}");
+
+                    var filterMessage = filters.Any() ? $" with filters: {string.Join(", ", filters)}" : "";
+                    return NotFound($"No cards found for user {userId}{filterMessage}");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user cards for {UserId}", userId);
+                return StatusCode(500, "An error occurred while processing your request");
+            }
         }
     }
 }
