@@ -31,6 +31,51 @@ namespace CardOperationsService.Tests
         }
 
         [Fact]
+        public void Should_Allow_CorrectActions_For_Debit_Active_WithPin()
+        {
+            var card = new CardDetails("TEST123", CardType.Debit, CardStatus.Active, true);
+
+            var result = CardRules.GetAllowedActions(card);
+
+            result.Should().BeEquivalentTo(new[]
+            {
+                CardAction.Action1,
+                CardAction.Action3,
+                CardAction.Action4,
+                CardAction.Action6,
+                CardAction.Action8,
+                CardAction.Action9,
+                CardAction.Action10,
+                CardAction.Action11,
+                CardAction.Action12,
+                CardAction.Action13
+            });
+        }
+
+        [Fact]
+        public void Should_Allow_CorrectActions_For_Debit_Active_WithoutPin()
+        {
+            var card = new CardDetails("TEST123", CardType.Debit, CardStatus.Active, false);
+
+            var result = CardRules.GetAllowedActions(card);
+
+            result.Should().BeEquivalentTo(new[]
+            {
+                CardAction.Action1,
+                CardAction.Action3,
+                CardAction.Action4,
+                CardAction.Action7,
+                CardAction.Action8,
+                CardAction.Action9,
+                CardAction.Action10,
+                CardAction.Action11,
+                CardAction.Action12,
+                CardAction.Action13
+            });
+        }
+
+
+        [Fact]
         public void Should_Allow_CorrectActions_For_Prepaid_Ordered_WithoutPin()
         {
             var card = new CardDetails("TEST123", CardType.Prepaid, CardStatus.Ordered, false);
