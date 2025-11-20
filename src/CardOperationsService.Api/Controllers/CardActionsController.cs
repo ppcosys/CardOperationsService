@@ -1,5 +1,5 @@
 ﻿using CardOperationsService.Application.Cards.Queries.GetAllowedCardActions;
-
+using CardOperationsService.Contracts.CardActions;
 using CardOperationsService.Domain.Entities;
 using CardOperationsService.Domain.Enums;
 using MediatR;
@@ -22,29 +22,31 @@ namespace CardOperationsService.Api.Controllers
         }
 
         [HttpPost("allowed")]
-        public async Task<IActionResult> GetAllowedActions([FromBody] CardDetails card)
+        public async Task<IActionResult> GetAllowedActions([FromBody] GetAllowedActionsRequest request)
         {
-            if (card == null)
-                return BadRequest("Card details are required");
-
-            if (string.IsNullOrWhiteSpace(card.CardNumber))
-                return BadRequest("Card number is required");
-
-            if (!Enum.IsDefined(typeof(CardType), card.CardType))
+            if (!Enum.IsDefined(typeof(CardType), request.CardType))
                 return BadRequest($"Invalid card type. Valid values: {string.Join(", ", Enum.GetNames<CardType>())}");
 
-            if (!Enum.IsDefined(typeof(CardStatus), card.CardStatus))
+            if (!Enum.IsDefined(typeof(CardStatus), request.CardStatus))
                 return BadRequest($"Invalid card status. Valid values: {string.Join(", ", Enum.GetNames<CardStatus>())}");
 
             try
             {
+                var card = new CardDetails(
+                    CardNumber: "",
+                    CardType: request.CardType,
+                    CardStatus: request.CardStatus,
+                    IsPinSet: request.IsPinSet
+                );
+
                 var query = new GetAllowedCardActionsQuery(card);
                 var result = await _mediator.Send(query);
+
                 return Ok(new { allowedActions = result });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving allowed actions for card {CardNumber}", card.CardNumber);
+                _logger.LogError(ex, "Error retrieving allowed actions");
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
