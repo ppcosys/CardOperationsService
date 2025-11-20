@@ -1,6 +1,7 @@
 ﻿using CardOperationsService.Application.Cards.Queries.GetAllowedCardActions;
 using CardOperationsService.Domain.Abstractions;
 using CardOperationsService.Infrastructure.Services;
+using System.Text.Json.Serialization;
 
 namespace CardOperationsService.Api;
 
@@ -17,7 +18,10 @@ public class Program
         builder.Logging.SetMinimumLevel(LogLevel.Information);
 
         // Add services to the container.
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddJsonOptions(opts =>
+        {
+            opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
         builder.Services.AddSingleton<ICardService, InMemoryCardService>();
 
